@@ -10,7 +10,7 @@
     - Krzysztof Wiewióra
 
 - [**Repozytorium GitHub**](https://github.com/okmarcel/MyTutorApp)  
-- [**Projekt online (GitHub Projects)**](https://github.com/okmarcel/projects/2)
+- [**Projekt online (GitHub Projects)**](https://github.com/users/okmarcel/projects/2)
 
 ---
 
