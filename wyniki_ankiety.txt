@@ -1,0 +1,76 @@
+Próba badawcza: 42 kursantów, 18 korepetytorów
+
+
+1. Częstotliwość uczestnictwa w zajęciach
+Kilka razy w tygodniu – 50%
+Raz w tygodniu – 35%
+Rzadziej – 15%
+
+Wniosek: system będzie używany regularnie, więc musi być szybki i dostępny na co dzień.
+
+2. Sposób sprawdzania harmonogramu
+Wiadomości (SMS / Messenger / e-mail) – 45%
+Kalendarz – 30%
+Arkusz (Excel / Sheets) – 20%
+Inne – 5%
+
+Wniosek: brak jednego centralnego systemu – dane są rozproszone.
+
+3. Sposób informowania o zmianach
+Ręcznie pisane wiadomości – 50%
+Telefon – 25%
+Samodzielne sprawdzanie – 20%
+Inne – 5%
+
+Wniosek: komunikacja jest manualna i niespójna.
+
+4. Problemy z informacją o zmianach
+Tak, wielokrotnie – 20%
+Tak, sporadycznie – 60%
+Nie – 20%
+
+Wniosek: aż 80% użytkowników miało problem z informacją o zmianach.
+
+5. Ocena obecnej organizacji
+Bardzo dobra – 5%
+Dobra – 25%
+Średnia – 40%
+Słaba – 30%
+
+Wniosek: obecny system jest niewystarczający (70% ocen średnich lub słabych).
+
+6. Kluczowe funkcje i cechy systemu (wielokrotny wybór)
+Dostęp do harmonogramu – 90%
+Powiadomienia o zmianach – 85%
+Prosty interfejs  – 75%
+Zapisy na zajęcia – 60% (wśród kursantów)
+Lista kursantów – 60% (wśród korepetytorów)
+Historia zajęć – 35%
+
+Wniosek: najważniejsze są harmonogram oraz powiadomienia.
+
+7. Urządzenia użytkowników
+Telefon – 70%
+Laptop / komputer – 25%
+Tablet – 5%
+
+Wniosek: system musi być responsywny.
+
+8. Preferowana forma dostępu
+Przeglądarka internetowa – 55%
+Aplikacja mobilna – 30%
+Bez znaczenia – 15%
+
+Wniosek: aplikacja webowa jest najlepszym wyborem.
+
+10. Co najbardziej irytuje Cię w obecnej organizacji?
+"Ciągłe szukanie w wiadomościach, czy zajęcia są w tę, czy w tamtą środę" – kursant.
+"Dostaję SMS-a o zmianie o 22:00 dzień przed, a czasem w ogóle" – kursant.
+"Często nie mogę sprawdzić obecności uczniów w Excelu, bo arkusz na telefonie ładuje się wieki" – korepetytor.
+
+11. Sugestie do aplikacji:
+"Chciałbym widzieć od razu, ile zajęć już odbyłem w tym miesiącu" – kursant.
+"System powinien sam pilnować, żeby nie wpisać mi dwóch zajęć na tę samą godzinę" – korepetytor.
+
+
+
