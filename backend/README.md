@@ -1,6 +1,6 @@
 # Backend
 
-Backend codebase for MyTutor application.
+Java + Spring Boot backend codebase for MyTutor application.
 
 ## Running
 
