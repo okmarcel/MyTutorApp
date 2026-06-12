@@ -14,7 +14,7 @@ public class TutoringGroup {
   @Column(nullable = false) private String subject;
   @Column(nullable = false) private int capacity;
   @ManyToOne private User tutor;
-  @JsonIgnore @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE) private List<Enrollment> enrollments = new ArrayList<>();
+  @JsonIgnore @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER) private List<Enrollment> enrollments = new ArrayList<>();
   @JsonIgnore @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE) private List<Lesson> lessons = new ArrayList<>();
 
   protected TutoringGroup() {}
@@ -28,9 +28,12 @@ public class TutoringGroup {
   public int getCapacity() { return capacity; }
   public User getTutor() { return tutor; }
   public List<Enrollment> getEnrollments() { return enrollments; }
+  public long getActiveEnrollmentCount() {
+    return enrollments.stream().filter(e -> e.getStatus() == EnrollmentStatus.ACTIVE).count();
+  }
   public void addEnrollment(Enrollment enrollment) { enrollments.add(enrollment); }
   public boolean hasFreePlaces() {
-    return enrollments.stream().filter(e -> e.getStatus() == EnrollmentStatus.ACTIVE).count() < capacity;
+    return getActiveEnrollmentCount() < capacity;
   }
   public void update(String name, String level, String subject, int capacity) {
     this.name = name; this.level = level; this.subject = subject; this.capacity = capacity;

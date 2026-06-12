@@ -21,13 +21,13 @@ async function safeJson(res: Response) {
   }
 }
 
-export async function apiGet<T>(path: string): Promise<T> {
+export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const base = (import.meta.env.VITE_API_BASE as string | undefined) ?? "";
   const url = `${base}${path}`;
 
   const res = await fetch(url, {
-    method: "GET",
-    headers: { Accept: "application/json" }
+    ...init,
+    headers: { Accept: "application/json", "Content-Type": "application/json", ...init.headers }
   });
 
   const body = await safeJson(res);
@@ -35,3 +35,6 @@ export async function apiGet<T>(path: string): Promise<T> {
   return body as T;
 }
 
+export async function apiGet<T>(path: string): Promise<T> {
+  return apiRequest<T>(path);
+}

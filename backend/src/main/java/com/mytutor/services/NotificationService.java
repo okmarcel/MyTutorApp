@@ -12,6 +12,7 @@ public class NotificationService {
   private final NotificationRepository notifications;
   public NotificationService(NotificationRepository notifications) { this.notifications = notifications; }
 
+  public List<Notification> findAll() { return notifications.findAll(); }
   public List<Notification> findByUserId(Long userId) { return notifications.findByUserIdOrderByCreatedAtDesc(userId); }
   public Notification markAsRead(Long notificationId, Long userId) {
     Notification notification = notifications.findById(notificationId)
