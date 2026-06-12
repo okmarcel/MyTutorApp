@@ -1,17 +1,31 @@
-# Frontend
+# MyTutor Frontend
 
-Typescript + React frontend codebase for MyTutor.
+Frontend React + TypeScript zbudowany według prototypu `My_tutor_hi-fi.pdf`.
 
-## Running
+## Uruchomienie
 
-```
+```bash
 npm install
 npm run dev
 ```
 
-Then open the URL shown in your terminal (default: `http://localhost:5173`).
+Aplikacja będzie dostępna pod adresem `http://localhost:5173`.
 
-## Backend API (dev)
+## Połączenie z backendem
 
-The frontend expects the Spring Boot backend on `http://localhost:8080` and uses a Vite dev proxy for `/api/*`.
-Start the backend first with `cd ../backend && ./gradlew bootRun`.
+Frontend korzysta z backendu Spring Boot dostępnego pod adresem `http://localhost:8080`.
+Podczas pracy lokalnej żądania `/api/*` są przekazywane do backendu przez proxy Vite.
+
+Przed uruchomieniem frontendu należy uruchomić backend:
+
+```bash
+cd ../backend
+./gradlew bootRun
+```
+
+## Weryfikacja
+
+```bash
+npm run typecheck
+npm run build
+```
