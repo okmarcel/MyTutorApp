@@ -1,4 +1,4 @@
-package com.mytutor.api;
+package com.mytutor.controllers;
 
 import java.time.Instant;
 import java.util.Map;
@@ -8,8 +8,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HealthController {
   @GetMapping("/api/health")
-  public Map<String, Object> health() {
-    return Map.of("ok", true, "ts", Instant.now().toString());
-  }
+  public Map<String, Object> health() { return Map.of("ok", true, "timestamp", Instant.now()); }
 }
-

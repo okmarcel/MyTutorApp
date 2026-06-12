@@ -1,11 +1,21 @@
-# Backend
+# MyTutor Backend
 
-Java + Spring Boot backend codebase for MyTutor application.
+Backend Spring Boot zbudowany według diagramów w `specyfikacja/`.
 
-## Running
+## Uruchomienie
 
-To run backend:
-
-```
+```bash
 ./gradlew bootRun
 ```
+
+Domyślnie aplikacja używa bazy H2 w pamięci. Konfigurację można nadpisać standardowymi
+zmiennymi Spring Boot.
+
+## Główne zasoby REST
+
+- `/api/users`
+- `/api/groups`
+- `/api/lessons`
+- `/api/enrollments`
+- `/api/notifications`
+- `/api/health`
