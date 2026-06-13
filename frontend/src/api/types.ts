@@ -1,8 +1,9 @@
+/* ---- Enums ---- */
 export type UserRole = "ADMIN" | "TUTOR" | "STUDENT";
 export type LessonStatus = "PLANNED" | "CANCELLED" | "COMPLETED";
 export type EnrollmentStatus = "ACTIVE" | "CANCELLED";
 export type NotificationStatus = "UNREAD" | "READ";
-
+/* ---- Entities (match backend JSON) ---- */
 export type User = {
   id: number;
   firstName: string;
@@ -12,7 +13,6 @@ export type User = {
   phoneNumber: string | null;
   role: UserRole;
 };
-
 export type TutoringGroup = {
   id: number;
   name: string;
@@ -23,7 +23,6 @@ export type TutoringGroup = {
   freePlaces: boolean;
   activeEnrollmentCount: number;
 };
-
 export type Enrollment = {
   id: number;
   student: User;
@@ -31,7 +30,6 @@ export type Enrollment = {
   status: EnrollmentStatus;
   enrolledAt: string;
 };
-
 export type Lesson = {
   id: number;
   group: TutoringGroup;
@@ -40,7 +38,6 @@ export type Lesson = {
   endTime: string;
   status: LessonStatus;
 };
-
 export type Notification = {
   id: number;
   title: string;
@@ -48,65 +45,40 @@ export type Notification = {
   createdAt: string;
   status: NotificationStatus;
 };
-
-export type DashboardData = {
-  users: User[];
-  groups: TutoringGroup[];
-  lessons: Lesson[];
-  notifications: Notification[];
+/* ---- Request DTOs ---- */
+export type UserRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber?: string;
+  password: string;
+  role: UserRole;
 };
-
-export type LessonRow = {
-  id: number;
-  startAt: string;
-  endAt: string;
-  groupName: string;
-  subject: string;
-  tutorName: string;
-  room: string;
-  status: string;
-};
-
-export type NotificationRow = {
-  id: number;
-  title: string;
-  body: string;
-  severity: string;
-  createdAt: string;
-};
-
-export type GroupRow = {
-  id: number;
+export type GroupRequest = {
   name: string;
-  subject: string;
   level: string;
-  studentsCount: number;
-  primaryTutor: string;
-  scheduleHint: string;
+  subject: string;
+  capacity: number;
+  tutorId: number | null;
 };
-
-export type StudentRow = {
-  id: number;
-  name: string;
-  email: string;
-  grade: string;
-  activeGroups: number;
-  guardian: string;
-  status: string;
+export type LessonRequest = {
+  groupId: number;
+  date: string;
+  startTime: string;
+  endTime: string;
 };
-
-export type TutorRow = {
-  id: number;
-  name: string;
-  email: string;
-  subjects: string;
-  groupsCount: number;
-  availability: string;
-  status: string;
-};
-
-export type DashboardResponse = {
-  kpis: { activeStudents: number; tutors: number; groupCount: number; classesThisWeek: number };
-  todaysLessons: LessonRow[];
-  notifications: NotificationRow[];
-};
+/* ---- App-level types ---- */
+export type View =
+    | "dashboard" | "schedule" | "groups" | "group-detail"
+    | "students" | "tutors" | "notifications" | "enroll" | "history";
+export type ModalState =
+    | { type: "add-lesson" }
+    | { type: "add-student" }
+    | { type: "add-tutor" }
+    | { type: "edit-user"; user: User }
+    | { type: "create-group" }
+    | { type: "edit-group"; group: TutoringGroup }
+    | { type: "lesson-detail"; lesson: Lesson }
+    | { type: "enroll-group"; group: TutoringGroup }
+    | { type: "confirm"; title: string; message: string; onConfirm: () => void }
+    | null;
