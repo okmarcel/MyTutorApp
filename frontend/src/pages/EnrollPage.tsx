@@ -5,14 +5,12 @@ type Props = {
     enrollments: Enrollment[];
     userId: number;
     onOpenModal: (m: ModalState) => void;
-    onRefresh: () => void;
 };
 export function EnrollPage({
                                groups,
                                enrollments,
                                userId,
                                onOpenModal,
-                               onRefresh,
                            }: Props) {
     const [search, setSearch] = useState("");
     const [subjectFilter, setSubjectFilter] = useState("");

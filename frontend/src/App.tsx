@@ -49,10 +49,6 @@ export default function App() {
         return data.groups;
     }, [data.groups, auth]);
 
-    const visibleUsers = useMemo(() => {
-        return data.users;
-    }, [data.users]);
-
     function handleLogin(role: UserRole, userId: number, username: string) {
         setAuth({ role, userId, username });
         setView("dashboard");
@@ -82,7 +78,7 @@ export default function App() {
             content = (
                 <DashboardPage
                     role={role}
-                    users={visibleUsers}
+                    users={data.users}
                     groups={visibleGroups}
                     lessons={data.lessons}
                     unread={unread}
@@ -138,7 +134,7 @@ export default function App() {
         }
         case "students":
             content = (
-                <StudentsPage users={visibleUsers} onOpenModal={setModal} />
+                <StudentsPage users={data.users} onOpenModal={setModal} />
             );
             break;
         case "tutors":
@@ -166,7 +162,6 @@ export default function App() {
                     enrollments={data.enrollments}
                     userId={userId}
                     onOpenModal={setModal}
-                    onRefresh={data.refresh}
                 />
             );
             break;

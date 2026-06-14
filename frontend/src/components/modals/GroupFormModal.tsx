@@ -87,6 +87,10 @@ export function GroupFormModal({
             };
 
             let groupId: number;
+            const previously = new Set(enrolledStudentIds);
+            const toAdd = [...selectedStudents].filter((id) => !previously.has(id));
+            const toRemove = [...previously].filter((id) => !selectedStudents.has(id));
+
             if (mode === "create") {
                 const created = await apiPost<TutoringGroup>("/api/groups", {
                     ...body,
@@ -94,6 +98,9 @@ export function GroupFormModal({
                 });
                 groupId = created.id;
             } else {
+                for (const sid of toRemove) {
+                    await apiDelete(`/api/groups/${group!.id}/students/${sid}`);
+                }
                 await apiPut<TutoringGroup>(`/api/groups/${group!.id}`, body);
                 groupId = group!.id;
             }
@@ -108,17 +115,9 @@ export function GroupFormModal({
                 }
             }
 
-            const previously = new Set(enrolledStudentIds);
-            const toAdd = [...selectedStudents].filter((id) => !previously.has(id));
-            const toRemove = [...previously].filter((id) => !selectedStudents.has(id));
-            await Promise.all([
-                ...toAdd.map((sid) =>
-                    apiPost(`/api/groups/${groupId}/students/${sid}`)
-                ),
-                ...toRemove.map((sid) =>
-                    apiDelete(`/api/groups/${groupId}/students/${sid}`)
-                ),
-            ]);
+            for (const sid of toAdd) {
+                await apiPost(`/api/groups/${groupId}/students/${sid}`);
+            }
             onDone();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Nie udało się zapisać");

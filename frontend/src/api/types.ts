@@ -80,5 +80,4 @@ export type ModalState =
     | { type: "edit-group"; group: TutoringGroup }
     | { type: "lesson-detail"; lesson: Lesson }
     | { type: "enroll-group"; group: TutoringGroup }
-    | { type: "confirm"; title: string; message: string; onConfirm: () => void }
     | null;

@@ -23,7 +23,7 @@
     --sidebar-w: 240px;
     --font: 'Inter', system-ui, -apple-system, sans-serif;
 }
-/* ---- 2. Reset & Base ---- */
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     font-family: var(--font);
@@ -40,7 +40,7 @@ h1 { font-size: 28px; font-weight: 700; }
 h2 { font-size: 22px; font-weight: 600; }
 h3 { font-size: 17px; font-weight: 600; }
 img { max-width: 100%; }
-/* ---- 3. Layout ---- */
+
 .app {
     min-height: 100vh;
     display: grid;
@@ -51,7 +51,7 @@ img { max-width: 100%; }
     min-width: 0;
     overflow-x: hidden;
 }
-/* ---- 4. Login Page ---- */
+
 .login-page {
     min-height: 100vh;
     display: grid;
@@ -93,23 +93,11 @@ img { max-width: 100%; }
     margin-bottom: 10px;
     font-size: 14px;
 }
-.login-hint-table {
-    width: 100%;
-    border-collapse: collapse;
+.quick-login-buttons {
+    display: flex;
+    gap: 8px;
 }
-.login-hint-table td {
-    padding: 4px 8px;
-    font-size: 13px;
-    color: var(--text-secondary);
-}
-.login-hint-table tr + tr td {
-    border-top: 1px solid var(--border);
-}
-.login-hint-table td:first-child {
-    font-weight: 600;
-    color: var(--text);
-}
-/* ---- 5. Sidebar ---- */
+
 .sidebar {
     height: 100vh;
     background: var(--surface);
@@ -189,7 +177,7 @@ img { max-width: 100%; }
     padding: 14px;
     border-top: 1px solid var(--border);
 }
-/* ---- 6. Buttons ---- */
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -237,7 +225,7 @@ img { max-width: 100%; }
     border-radius: var(--radius-sm);
     display: grid; place-items: center;
 }
-/* ---- 7. Form Elements ---- */
+
 .field {
     display: flex;
     flex-direction: column;
@@ -266,7 +254,7 @@ img { max-width: 100%; }
 .input::placeholder { color: #b0b0b0; }
 .select-input { appearance: none; cursor: pointer; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-/* ---- 8. Page Header ---- */
+
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -282,7 +270,7 @@ img { max-width: 100%; }
     font-weight: 600;
     margin: 32px 0 16px;
 }
-/* ---- 9. Dashboard Cards ---- */
+
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -342,7 +330,7 @@ img { max-width: 100%; }
     font-weight: 400;
     color: var(--text-secondary);
 }
-/* ---- 10. Data Panel ---- */
+
 .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -363,7 +351,7 @@ img { max-width: 100%; }
 .panel-row:hover { background: #fafaff; }
 .panel-row-title { font-weight: 600; margin-bottom: 2px; }
 .panel-row-info { font-size: 13px; color: var(--text-secondary); }
-/* ---- 11. Toolbar / Search ---- */
+
 .toolbar {
     display: flex;
     gap: 12px;
@@ -377,7 +365,7 @@ img { max-width: 100%; }
 }
 .toolbar .input { flex: 1; min-width: 200px; }
 .toolbar .select-input { width: 180px; flex-shrink: 0; }
-/* ---- 12. Tables ---- */
+
 .table-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -405,7 +393,7 @@ img { max-width: 100%; }
 }
 .table tbody tr { transition: background var(--transition); }
 .table tbody tr:hover { background: #fafaff; }
-/* ---- 13. Calendar ---- */
+
 .week-nav {
     position: absolute;
     left: 50%;
@@ -479,7 +467,7 @@ img { max-width: 100%; }
 }
 .cal-event:hover { background: #e0e0ff; }
 .cal-event b { font-weight: 600; }
-/* ---- 14. Groups & Occupancy ---- */
+
 .groups-grid {
     display: grid;
     gap: 16px;
@@ -547,7 +535,7 @@ img { max-width: 100%; }
     white-space: nowrap;
     min-width: 42px;
 }
-/* ---- 15. Group Detail ---- */
+
 .group-detail-header {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -583,7 +571,7 @@ img { max-width: 100%; }
     border-bottom: 1px solid var(--border);
 }
 .member-item:last-child { border-bottom: none; }
-/* ---- 16. Notifications ---- */
+
 .notification-item {
     padding: 16px 18px;
     border-bottom: 1px solid var(--border);
@@ -617,7 +605,7 @@ img { max-width: 100%; }
 }
 .pill-primary { background: var(--primary); color: white; }
 .pill-muted { background: #e5e7eb; color: var(--text-secondary); }
-/* ---- 17. Enrollment / History ---- */
+
 .enroll-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -643,7 +631,7 @@ img { max-width: 100%; }
 .enroll-detail-date { font-weight: 500; min-width: 90px; }
 .enroll-detail-time { color: var(--text-secondary); }
 .history-section { margin-bottom: 32px; }
-/* ---- 18. Modals ---- */
+
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -690,7 +678,7 @@ img { max-width: 100%; }
     margin-bottom: 16px;
     font-size: 14px;
 }
-/* Step indicator for 2-step group form */
+
 .step-dots {
     display: flex;
     justify-content: center;
@@ -703,14 +691,14 @@ img { max-width: 100%; }
     background: var(--border);
 }
 .step-dot.active { background: var(--primary); }
-/* Confirm dialog */
+
 .confirm-text {
     font-size: 15px;
     color: var(--text-secondary);
     margin-bottom: 24px;
     line-height: 1.5;
 }
-/* Checkbox list in group form */
+
 .checkbox-list {
     max-height: 300px;
     overflow-y: auto;
@@ -733,7 +721,7 @@ img { max-width: 100%; }
     accent-color: var(--primary);
     cursor: pointer;
 }
-/* ---- 19. Empty / Error States ---- */
+
 .empty-state {
     text-align: center;
     padding: 48px 24px;
@@ -754,7 +742,7 @@ img { max-width: 100%; }
     padding: 40px;
     text-align: center;
 }
-/* ---- 20. Utilities ---- */
+
 .muted { color: var(--text-secondary); }
 .text-sm { font-size: 13px; }
 .text-danger { color: var(--danger); }
@@ -767,7 +755,7 @@ img { max-width: 100%; }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
 .flex-1 { flex: 1; }
-/* ---- 21. Mobile Navigation ---- */
+
 .mobile-nav {
     display: none;
     gap: 6px;
@@ -783,7 +771,7 @@ img { max-width: 100%; }
     white-space: nowrap;
     flex-shrink: 0;
 }
-/* ---- 22. Animations ---- */
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -792,7 +780,7 @@ img { max-width: 100%; }
     from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
 }
-/* ---- 23. Responsive ---- */
+
 @media (max-width: 1024px) {
     .cards-grid { grid-template-columns: repeat(2, 1fr); }
     .actions-grid { grid-template-columns: repeat(2, 1fr); }

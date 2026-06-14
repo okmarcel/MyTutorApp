@@ -12,18 +12,22 @@ export function LoginPage({ onLogin }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError("");
+  async function loginWith(nextEmail: string, nextPassword: string) {
+    const trimmedEmail = nextEmail.trim();
+    const trimmedPassword = nextPassword.trim();
 
-    if (!email || !password) {
+    if (!trimmedEmail || !trimmedPassword) {
       setError("Wypełnij oba pola");
       return;
     }
 
+    setError("");
     setLoading(true);
     try {
-      const user = await apiPost<User>("/api/auth/login", { email, password });
+      const user = await apiPost<User>("/api/auth/login", {
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
       onLogin(user.role, user.id, user.fullName);
     } catch (err) {
       setError(
@@ -32,6 +36,17 @@ export function LoginPage({ onLogin }: Props) {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    await loginWith(email, password);
+  }
+
+  async function quickLogin(nextEmail: string, nextPassword: string) {
+    setEmail(nextEmail);
+    setPassword(nextPassword);
+    await loginWith(nextEmail, nextPassword);
   }
 
   return (
@@ -75,26 +90,33 @@ export function LoginPage({ onLogin }: Props) {
         </button>
 
         <div className="login-hint">
-          <strong>Konta testowe:</strong>
-          <table className="login-hint-table">
-            <tbody>
-              <tr>
-                <td>Admin</td>
-                <td>admin@mytutor.pl</td>
-                <td>admin123</td>
-              </tr>
-              <tr>
-                <td>Korepetytor</td>
-                <td>anna.nowak@mytutor.pl</td>
-                <td>tutor123</td>
-              </tr>
-              <tr>
-                <td>Kursant</td>
-                <td>kasia.z@student.pl</td>
-                <td>student123</td>
-              </tr>
-            </tbody>
-          </table>
+          <strong>Szybkie logowanie:</strong>
+          <div className="quick-login-buttons">
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => quickLogin("admin@mytutor.pl", "admin123")}
+              disabled={loading}
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => quickLogin("anna.nowak@mytutor.pl", "tutor123")}
+              disabled={loading}
+            >
+              Korepetytor
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => quickLogin("kasia.z@student.pl", "student123")}
+              disabled={loading}
+            >
+              Kursant
+            </button>
+          </div>
         </div>
       </form>
     </main>

@@ -1,9 +1,11 @@
 import type { UserRole, View } from "../api/types";
+
 const roleNames: Record<UserRole, string> = {
     ADMIN: "Administrator",
     TUTOR: "Korepetytor",
     STUDENT: "Kursant",
 };
+
 type SidebarProps = {
     role: UserRole;
     username: string;
@@ -38,6 +40,7 @@ export function Sidebar({ role, username, view, setView, unread, onLogout }: Sid
                     { v: "history", label: "Historia zajęć" },
                     { v: "notifications", label: "Powiadomienia" },
                 ];
+
     return (
         <aside className="sidebar">
             <div className="sidebar-header">
@@ -69,6 +72,7 @@ export function Sidebar({ role, username, view, setView, unread, onLogout }: Sid
         </aside>
     );
 }
+
 export function MobileNav({
                               role,
                               view,
@@ -103,6 +107,7 @@ export function MobileNav({
                     { v: "history", label: "Historia" },
                     { v: "notifications", label: "Powiadomienia" },
                 ];
+
     return (
         <div className="mobile-nav">
             {items.map((item) => (
