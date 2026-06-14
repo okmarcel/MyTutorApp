@@ -1,6 +1,7 @@
 package com.mytutor.services;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.notNull;
 
 import com.mytutor.dto.*;
 import com.mytutor.model.*;
@@ -149,6 +150,11 @@ class MyTutorServicesTest {
     Lesson lesson = schedule.createLesson(new LessonRequest(first.getId(), date, LocalTime.of(10, 0), LocalTime.of(11, 0)));
 
     schedule.removeLesson(lesson.getId());
+
+    Notification notification = notifications.findByUserId(tutor.getId()).getFirst();
+
+    assertThat(notification.getTitle()).isEqualTo("Zajęcia odwołane");
+
     assertThat(schedule.findById(lesson.getId()).getStatus()).isEqualTo(LessonStatus.CANCELLED);
 
     lesson.complete();
