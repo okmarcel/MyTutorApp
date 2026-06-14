@@ -35,6 +35,9 @@ public class TutoringGroup {
   public boolean hasFreePlaces() {
     return getActiveEnrollmentCount() < capacity;
   }
+  public boolean getFreePlaces() { //Wymagana do JSONa
+    return hasFreePlaces();
+  }
   public void update(String name, String level, String subject, int capacity) {
     this.name = name; this.level = level; this.subject = subject; this.capacity = capacity;
   }

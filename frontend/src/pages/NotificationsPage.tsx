@@ -11,7 +11,7 @@ export function NotificationsPage({ notifications, userId, onRefresh }: Props) {
             await apiPut(`/api/notifications/${id}/read?userId=${userId}`);
             onRefresh();
         } catch {
-            // silently fail
+
         }
     }
     return (
@@ -25,8 +25,6 @@ export function NotificationsPage({ notifications, userId, onRefresh }: Props) {
                     <div
                         className={`notification-item ${n.status === "UNREAD" ? "unread" : ""}`}
                         key={n.id}
-                        onClick={() => n.status === "UNREAD" && markAsRead(n.id)}
-                        style={{ cursor: n.status === "UNREAD" ? "pointer" : undefined }}
                     >
                         <div>
                             <div className="notification-title">{n.title}</div>
@@ -36,11 +34,16 @@ export function NotificationsPage({ notifications, userId, onRefresh }: Props) {
                             </div>
                         </div>
                         <div className="notification-actions">
-              <span
-                  className={`pill ${n.status === "UNREAD" ? "pill-primary" : "pill-muted"}`}
-              >
-                {n.status === "UNREAD" ? "Nowe" : "Odczytane"}
-              </span>
+                            {n.status === "UNREAD" ? (
+                                <button
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={() => markAsRead(n.id)}
+                                >
+                                    Oznacz jako przeczytane
+                                </button>
+                            ) : (
+                                <span className="pill pill-muted">Odczytane</span>
+                            )}
                         </div>
                     </div>
                 ))}

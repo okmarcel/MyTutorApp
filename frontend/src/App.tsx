@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { useData } from "./hooks/useData";
 import type { UserRole, View, ModalState } from "./api/types";
-/* ---- Layout ---- */
+
 import { Sidebar, MobileNav } from "./components/Sidebar";
-/* ---- Pages ---- */
+
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { SchedulePage } from "./pages/SchedulePage";
@@ -14,32 +14,33 @@ import { TutorsPage } from "./pages/TutorsPage";
 import { NotificationsPage } from "./pages/NotificationsPage";
 import { EnrollPage } from "./pages/EnrollPage";
 import { HistoryPage } from "./pages/HistoryPage";
-/* ---- Modals ---- */
+
 import { AddLessonModal } from "./components/modals/AddLessonModal";
 import { AddUserModal } from "./components/modals/AddUserModal";
 import { EditUserModal } from "./components/modals/EditUserModal";
 import { GroupFormModal } from "./components/modals/GroupFormModal";
 import { LessonDetailModal } from "./components/modals/LessonDetailModal";
+import { EnrollDetailModal } from "./components/modals/EnrollDetailModal";
 export default function App() {
-    /* ---- Auth state ---- */
+
     const [auth, setAuth] = useState<{
         role: UserRole;
         userId: number;
         username: string;
     } | null>(null);
-    /* ---- Navigation ---- */
+
     const [view, setView] = useState<View>("dashboard");
     const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
-    /* ---- Modal ---- */
+
     const [modal, setModal] = useState<ModalState>(null);
-    /* ---- Data ---- */
+
     const data = useData(auth?.role ?? null, auth?.userId ?? null);
-    /* ---- Derived ---- */
+
     const unread = useMemo(
         () => data.notifications.filter((n) => n.status === "UNREAD").length,
         [data.notifications]
     );
-    // For tutor: filter to own groups
+
     const visibleGroups = useMemo(() => {
         if (!auth) return data.groups;
         if (auth.role === "TUTOR") {
@@ -47,22 +48,11 @@ export default function App() {
         }
         return data.groups;
     }, [data.groups, auth]);
-    // For tutor: filter students to those in their groups
+
     const visibleUsers = useMemo(() => {
-        if (!auth || auth.role !== "TUTOR") return data.users;
-        const tutorGroupIds = new Set(visibleGroups.map((g) => g.id));
-        const studentIdsInGroups = new Set(
-            data.enrollments
-                .filter(
-                    (e) => e.status === "ACTIVE" && tutorGroupIds.has(e.group.id)
-                )
-                .map((e) => e.student.id)
-        );
-        return data.users.filter(
-            (u) => u.role !== "STUDENT" || studentIdsInGroups.has(u.id)
-        );
-    }, [data.users, data.enrollments, auth, visibleGroups]);
-    /* ---- Handlers ---- */
+        return data.users;
+    }, [data.users]);
+
     function handleLogin(role: UserRole, userId: number, username: string) {
         setAuth({ role, userId, username });
         setView("dashboard");
@@ -82,7 +72,7 @@ export default function App() {
         setModal(null);
         data.refresh();
     }
-    /* ---- Login screen ---- */
+
     if (!auth) return <LoginPage onLogin={handleLogin} />;
     const { role, userId, username } = auth;
     /* ---- Resolve which page to show ---- */
@@ -266,7 +256,7 @@ export default function App() {
                         onClose={() => setModal(null)}
                         onDone={() => {
                             handleModalDone();
-                            // If we deleted the group, go back to groups list
+
                             setView("groups");
                         }}
                     />
@@ -290,7 +280,14 @@ export default function App() {
                 );
                 break;
             case "enroll-group":
-                // Handled inline in EnrollPage
+                modalEl = (
+                    <EnrollDetailModal
+                        group={modal.group}
+                        userId={userId}
+                        onClose={() => setModal(null)}
+                        onDone={handleModalDone}
+                    />
+                );
                 break;
         }
     }

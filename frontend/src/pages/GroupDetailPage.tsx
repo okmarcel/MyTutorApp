@@ -26,7 +26,7 @@ export function GroupDetailPage({
             await apiDelete(`/api/groups/${group.id}/students/${studentId}`);
             onRefresh();
         } catch {
-            // silently fail
+
         } finally {
             setRemoving(null);
         }

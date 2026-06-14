@@ -274,6 +274,7 @@ img { max-width: 100%; }
     gap: 16px;
     margin-bottom: 24px;
     flex-wrap: wrap;
+    position: relative;
 }
 .page-header h1 { margin: 0; }
 .section-title {
@@ -325,6 +326,21 @@ img { max-width: 100%; }
 .action-btn:hover {
     background: var(--primary-light);
     border-color: var(--primary);
+}
+.action-btn-rich {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    padding: 14px 18px;
+    height: auto;
+    min-height: 48px;
+    gap: 4px;
+}
+.action-btn-sub {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
 }
 /* ---- 10. Data Panel ---- */
 .panel {
@@ -390,6 +406,15 @@ img { max-width: 100%; }
 .table tbody tr { transition: background var(--transition); }
 .table tbody tr:hover { background: #fafaff; }
 /* ---- 13. Calendar ---- */
+.week-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.week-nav-label { font-size: 14px; color: var(--text-secondary); }
 .calendar-wrap { overflow-x: auto; }
 .calendar {
     display: grid;
@@ -432,20 +457,25 @@ img { max-width: 100%; }
 .cal-cell {
     border-right: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
-    padding: 4px;
-    min-height: 60px;
+    padding: 0;
+    height: 60px;
     position: relative;
 }
 .cal-cell:nth-child(6n+1) { border-right: 1px solid var(--border); }
 .cal-event {
+    position: absolute;
+    left: 4px;
+    right: 4px;
     background: var(--primary-light);
     border-left: 3px solid var(--primary);
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
-    margin-bottom: 2px;
     cursor: pointer;
     transition: background var(--transition);
+    overflow: hidden;
+    z-index: 1;
+    box-sizing: border-box;
 }
 .cal-event:hover { background: #e0e0ff; }
 .cal-event b { font-weight: 600; }
@@ -604,6 +634,14 @@ img { max-width: 100%; }
 .enroll-card + .enroll-card { margin-top: 12px; }
 .enroll-card-name { font-weight: 600; margin-bottom: 2px; }
 .enroll-card-meta { font-size: 13px; color: var(--text-secondary); }
+.enroll-detail-lessons { display: flex; flex-direction: column; gap: 6px; }
+.enroll-detail-lesson {
+    display: flex; gap: 12px; align-items: center;
+    font-size: 13px; padding: 6px 10px;
+    background: var(--bg); border-radius: 6px;
+}
+.enroll-detail-date { font-weight: 500; min-width: 90px; }
+.enroll-detail-time { color: var(--text-secondary); }
 .history-section { margin-bottom: 32px; }
 /* ---- 18. Modals ---- */
 .modal-backdrop {

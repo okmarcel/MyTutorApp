@@ -30,35 +30,32 @@ export function useData(role: UserRole | null, userId: number | null) {
         setLoading(true);
         setError("");
         try {
-            /* ---- Common data ---- */
+
             const [usersData, groupsData] = await Promise.all([
                 apiGet<User[]>("/api/users"),
                 apiGet<TutoringGroup[]>("/api/groups"),
             ]);
-            /* ---- Lessons ---- */
+
             const lessonsData =
                 role === "ADMIN"
                     ? await apiGet<Lesson[]>("/api/lessons")
                     : userId
                         ? await apiGet<Lesson[]>(`/api/lessons/user/${userId}`)
                         : [];
-            /* ---- Notifications ---- */
-            const notificationsData =
-                role === "ADMIN"
-                    ? await apiGet<Notification[]>("/api/notifications")
-                    : userId
-                        ? await apiGet<Notification[]>(
-                            `/api/notifications/user/${userId}`
-                        )
-                        : [];
-            /* ---- Enrollments ---- */
+
+            const notificationsData = userId
+                ? await apiGet<Notification[]>(
+                    `/api/notifications/user/${userId}`
+                )
+                : [];
+
             let enrollmentsData: Enrollment[] = [];
             if (role === "STUDENT" && userId) {
                 enrollmentsData = await apiGet<Enrollment[]>(
                     `/api/enrollments/student/${userId}`
                 );
             } else {
-                // Admin & Tutor need enrollment data for group-detail view
+
                 const students = usersData.filter((u) => u.role === "STUDENT");
                 if (students.length > 0) {
                     const arrays = await Promise.all(

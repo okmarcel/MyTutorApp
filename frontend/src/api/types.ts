@@ -1,4 +1,4 @@
-/* ---- Enums ---- */
+
 export type UserRole = "ADMIN" | "TUTOR" | "STUDENT";
 export type LessonStatus = "PLANNED" | "CANCELLED" | "COMPLETED";
 export type EnrollmentStatus = "ACTIVE" | "CANCELLED";
@@ -45,7 +45,7 @@ export type Notification = {
   createdAt: string;
   status: NotificationStatus;
 };
-/* ---- Request DTOs ---- */
+
 export type UserRequest = {
   firstName: string;
   lastName: string;
@@ -67,7 +67,7 @@ export type LessonRequest = {
   startTime: string;
   endTime: string;
 };
-/* ---- App-level types ---- */
+
 export type View =
     | "dashboard" | "schedule" | "groups" | "group-detail"
     | "students" | "tutors" | "notifications" | "enroll" | "history";

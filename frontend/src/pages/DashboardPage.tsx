@@ -1,4 +1,5 @@
 import type { UserRole, View, ModalState, Lesson, User, TutoringGroup } from "../api/types";
+import { formatDatePL } from "../api/format";
 type Props = {
     role: UserRole;
     users: User[];
@@ -32,7 +33,7 @@ export function DashboardPage({
     ];
     const studentCards = [
         { value: planned.length, label: "Nadchodzące zajęcia" },
-        { value: groups.length, label: "Moje grupy" },
+        { value: unread, label: "Nowe powiadomienia" },
     ];
     const cards =
         role === "ADMIN" ? adminCards : role === "TUTOR" ? tutorCards : studentCards;
@@ -106,15 +107,14 @@ export function DashboardPage({
                 </div>
             )}
             {role === "STUDENT" && (
-                <div className="actions-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-                    <button className="action-btn" onClick={() => onNavigate("enroll")}>
-                        Zapisz się na zajęcia
+                <div className="actions-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
+                    <button className="action-btn action-btn-rich" onClick={() => onNavigate("enroll")}>
+                        <strong>Zapisz się na zajęcia</strong>
+                        <span className="action-btn-sub">Przeglądaj dostępne terminy</span>
                     </button>
-                    <button className="action-btn" onClick={() => onNavigate("schedule")}>
-                        Przeglądaj harmonogram
-                    </button>
-                    <button className="action-btn" onClick={() => onNavigate("history")}>
-                        Zobacz wszystkie zajęcia
+                    <button className="action-btn action-btn-rich" onClick={() => onNavigate("schedule")}>
+                        <strong>Przeglądaj harmonogram</strong>
+                        <span className="action-btn-sub">Zobacz wszystkie zajęcia</span>
                     </button>
                 </div>
             )}
@@ -133,7 +133,7 @@ export function DashboardPage({
                         <div>
                             <div className="panel-row-title">{l.group.name}</div>
                             <div className="panel-row-info">
-                                {l.date} | {l.startTime.slice(0, 5)}-{l.endTime.slice(0, 5)}
+                                {formatDatePL(l.date)} | {l.startTime.slice(0, 5)}-{l.endTime.slice(0, 5)}
                             </div>
                         </div>
                         <button

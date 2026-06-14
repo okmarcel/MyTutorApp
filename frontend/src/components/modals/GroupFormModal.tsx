@@ -55,8 +55,12 @@ export function GroupFormModal({
     function toggleStudent(id: number) {
         setSelectedStudents((prev) => {
             const next = new Set(prev);
-            if (next.has(id)) next.delete(id);
-            else next.add(id);
+            if (next.has(id)) {
+                next.delete(id);
+            } else {
+                if (next.size >= capacity) return prev;
+                next.add(id);
+            }
             return next;
         });
     }
@@ -65,6 +69,10 @@ export function GroupFormModal({
         setError("");
         if (!name || !level || !subject) {
             setError("Wypełnij wszystkie wymagane pola");
+            return;
+        }
+        if (selectedStudents.size > capacity) {
+            setError(`Liczba kursantów (${selectedStudents.size}) przekracza pojemność grupy (${capacity})`);
             return;
         }
 
@@ -243,20 +251,28 @@ export function GroupFormModal({
                 ) : (
                     <>
                         <h3 className="mb-4">Przypisz kursantów</h3>
+                        <div style={{ marginBottom: 12, fontSize: 14, color: selectedStudents.size >= capacity ? "var(--danger)" : "var(--muted)" }}>
+                            Wybrano {selectedStudents.size} / {capacity} miejsc
+                        </div>
                         <div className="checkbox-list">
                             {students.length === 0 && (
                                 <div className="empty-state">Brak kursantów w systemie</div>
                             )}
-                            {students.map((s) => (
-                                <label className="checkbox-item" key={s.id}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedStudents.has(s.id)}
-                                        onChange={() => toggleStudent(s.id)}
-                                    />
-                                    <span>{s.fullName}</span>
-                                </label>
-                            ))}
+                            {students.map((s) => {
+                                const isChecked = selectedStudents.has(s.id);
+                                const isFull = selectedStudents.size >= capacity;
+                                return (
+                                    <label className="checkbox-item" key={s.id} style={{ opacity: !isChecked && isFull ? 0.5 : 1 }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            disabled={!isChecked && isFull}
+                                            onChange={() => toggleStudent(s.id)}
+                                        />
+                                        <span>{s.fullName}</span>
+                                    </label>
+                                );
+                            })}
                         </div>
                         <div className="modal-footer">
                             {mode === "edit" && (

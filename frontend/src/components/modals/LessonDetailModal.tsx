@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { apiDelete, apiPost } from "../../api/client";
+import { formatDatePL } from "../../api/format";
 import type { Lesson, UserRole } from "../../api/types";
 type Props = {
     lesson: Lesson;
@@ -88,7 +89,7 @@ export function LessonDetailModal({
                 <div className="field">
                     <label>Data i godzina</label>
                     <div>
-                        {lesson.date}
+                        {formatDatePL(lesson.date)}
                         <br />
                         {lesson.startTime.slice(0, 5)} - {lesson.endTime.slice(0, 5)}
                     </div>

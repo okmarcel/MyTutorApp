@@ -1,7 +1,5 @@
 import { useState, useMemo } from "react";
 import type { TutoringGroup, Enrollment, ModalState } from "../api/types";
-import { OccupancyBar } from "../components/OccupancyBar";
-import { apiPost } from "../api/client";
 type Props = {
     groups: TutoringGroup[];
     enrollments: Enrollment[];
@@ -19,7 +17,6 @@ export function EnrollPage({
     const [search, setSearch] = useState("");
     const [subjectFilter, setSubjectFilter] = useState("");
     const [levelFilter, setLevelFilter] = useState("");
-    const [enrolling, setEnrolling] = useState<number | null>(null);
     const enrolledGroupIds = useMemo(
         () =>
             new Set(
@@ -29,7 +26,7 @@ export function EnrollPage({
             ),
         [enrollments, userId]
     );
-    // Show groups the student is NOT enrolled in and that have free places
+
     const available = groups.filter((g) => {
         if (enrolledGroupIds.has(g.id)) return false;
         if (!g.freePlaces) return false;
@@ -47,21 +44,9 @@ export function EnrollPage({
         () => [...new Set(groups.map((g) => g.level))].sort(),
         [groups]
     );
-    async function handleEnroll(groupId: number) {
-        setEnrolling(groupId);
-        try {
-            await apiPost(`/api/enrollments/student/${userId}/group/${groupId}`);
-            onRefresh();
-        } catch {
-            // silently fail
-        } finally {
-            setEnrolling(null);
-        }
-    }
     return (
         <>
             <h1>Zapis na zajęcia</h1>
-            <p className="muted mb-4">Dostępne zajęcia, na które możesz się zapisać</p>
             <div className="toolbar">
                 <input
                     className="input"
@@ -105,22 +90,18 @@ export function EnrollPage({
                             {g.level} · {g.subject}
                             {g.tutor ? ` · ${g.tutor.fullName}` : ""}
                         </div>
-                        <div className="mt-2">
-                            <OccupancyBar
-                                current={g.activeEnrollmentCount}
-                                capacity={g.capacity}
-                            />
-                        </div>
                     </div>
                     <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleEnroll(g.id)}
-                        disabled={enrolling === g.id}
+                        className="btn btn-secondary btn-sm"
+                        onClick={() =>
+                            onOpenModal({ type: "enroll-group", group: g })
+                        }
                     >
-                        {enrolling === g.id ? "Zapisuję..." : "Zapisz się"}
+                        Szczegóły
                     </button>
                 </div>
             ))}
         </>
     );
 }
+
