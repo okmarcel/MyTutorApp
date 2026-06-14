@@ -1,21 +1,34 @@
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { apiPost, apiPut, apiDelete } from "../../api/client";
-import type { TutoringGroup, User, GroupRequest } from "../../api/types";
+import type {
+    TutoringGroup,
+    User,
+    GroupRequest,
+    UserRole,
+} from "../../api/types";
+
 type Props = {
     mode: "create" | "edit";
     group?: TutoringGroup;
     tutors: User[];
     students: User[];
     enrolledStudentIds: number[];
+    currentRole: UserRole;
+    currentUserId: number;
     onClose: () => void;
     onDone: () => void;
 };
+
+const groupLevels = ["Podstawowy", "Średniozaawansowany", "Zaawansowany"];
+
 export function GroupFormModal({
                                    mode,
                                    group,
                                    tutors,
                                    students,
                                    enrolledStudentIds,
+                                   currentRole,
+                                   currentUserId,
                                    onClose,
                                    onDone,
                                }: Props) {
@@ -26,15 +39,19 @@ export function GroupFormModal({
     const [selectedStudents, setSelectedStudents] = useState<Set<number>>(
         new Set(enrolledStudentIds)
     );
-    // Step 1 form values
+
     const [name, setName] = useState(group?.name ?? "");
     const [level, setLevel] = useState(group?.level ?? "");
     const [subject, setSubject] = useState(group?.subject ?? "");
     const [capacity, setCapacity] = useState(group?.capacity ?? 10);
     const [tutorId, setTutorId] = useState<string>(
-        group?.tutor?.id?.toString() ?? ""
+        group?.tutor?.id?.toString() ??
+        (currentRole === "TUTOR" ? currentUserId.toString() : "")
     );
+
     const title = mode === "create" ? "Utwórz grupę" : "Edytuj grupę";
+    const canManageTutor = currentRole === "ADMIN";
+
     function toggleStudent(id: number) {
         setSelectedStudents((prev) => {
             const next = new Set(prev);
@@ -43,12 +60,14 @@ export function GroupFormModal({
             return next;
         });
     }
+
     async function handleSave() {
         setError("");
         if (!name || !level || !subject) {
             setError("Wypełnij wszystkie wymagane pola");
             return;
         }
+
         setSaving(true);
         try {
             const body: GroupRequest = {
@@ -56,17 +75,31 @@ export function GroupFormModal({
                 level,
                 subject,
                 capacity,
-                tutorId: tutorId ? Number(tutorId) : null,
+                tutorId: null,
             };
+
             let groupId: number;
             if (mode === "create") {
-                const created = await apiPost<TutoringGroup>("/api/groups", body);
+                const created = await apiPost<TutoringGroup>("/api/groups", {
+                    ...body,
+                    tutorId: currentRole === "TUTOR" ? currentUserId : body.tutorId,
+                });
                 groupId = created.id;
             } else {
                 await apiPut<TutoringGroup>(`/api/groups/${group!.id}`, body);
                 groupId = group!.id;
             }
-            // Manage student enrollments
+
+            const prevTutorId = group?.tutor?.id?.toString() ?? "";
+            const newTutorId = tutorId;
+            if (canManageTutor && newTutorId !== prevTutorId) {
+                if (newTutorId) {
+                    await apiPut(`/api/groups/${groupId}/tutor/${newTutorId}`);
+                } else if (prevTutorId) {
+                    await apiDelete(`/api/groups/${groupId}/tutor`);
+                }
+            }
+
             const previously = new Set(enrolledStudentIds);
             const toAdd = [...selectedStudents].filter((id) => !previously.has(id));
             const toRemove = [...previously].filter((id) => !selectedStudents.has(id));
@@ -85,11 +118,13 @@ export function GroupFormModal({
             setSaving(false);
         }
     }
+
     async function handleDelete() {
         if (!confirmDelete) {
             setConfirmDelete(true);
             return;
         }
+
         setSaving(true);
         try {
             await apiDelete(`/api/groups/${group!.id}`);
@@ -100,6 +135,7 @@ export function GroupFormModal({
             setSaving(false);
         }
     }
+
     return (
         <div className="modal-backdrop" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -133,13 +169,19 @@ export function GroupFormModal({
                         </div>
                         <div className="field">
                             <label>Poziom</label>
-                            <input
-                                className="input"
+                            <select
+                                className="input select-input"
                                 value={level}
                                 onChange={(e) => setLevel(e.target.value)}
-                                placeholder="np. Podstawowy, Średniozaawansowany"
                                 required
-                            />
+                            >
+                                <option value="">Wybierz poziom</option>
+                                {groupLevels.map((groupLevel) => (
+                                    <option value={groupLevel} key={groupLevel}>
+                                        {groupLevel}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="field">
                             <label>Liczba miejsc</label>
@@ -152,7 +194,7 @@ export function GroupFormModal({
                                 required
                             />
                         </div>
-                        {tutors.length > 0 && (
+                        {canManageTutor && tutors.length > 0 && (
                             <div className="field">
                                 <label>Korepetytor</label>
                                 <select

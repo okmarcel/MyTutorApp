@@ -241,6 +241,8 @@ export default function App() {
                         tutors={data.users.filter((u) => u.role === "TUTOR")}
                         students={data.users.filter((u) => u.role === "STUDENT")}
                         enrolledStudentIds={[]}
+                        currentRole={role}
+                        currentUserId={userId}
                         onClose={() => setModal(null)}
                         onDone={handleModalDone}
                     />
@@ -259,6 +261,8 @@ export default function App() {
                                     e.group.id === modal.group.id && e.status === "ACTIVE"
                             )
                             .map((e) => e.student.id)}
+                        currentRole={role}
+                        currentUserId={userId}
                         onClose={() => setModal(null)}
                         onDone={() => {
                             handleModalDone();
