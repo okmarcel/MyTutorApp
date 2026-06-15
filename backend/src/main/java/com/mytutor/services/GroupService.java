@@ -14,9 +14,10 @@ public class GroupService {
   private final UserService users;
   private final EnrollmentRepository enrollments;
   private final LessonRepository lessons;
+  private final ConflictService conflicts;
   private final NotificationService notifications;
-  public GroupService(GroupRepository groups, UserService users, EnrollmentRepository enrollments, LessonRepository lessons, NotificationService notifications) {
-    this.groups = groups; this.users = users; this.enrollments = enrollments; this.lessons = lessons; this.notifications = notifications;
+  public GroupService(GroupRepository groups, UserService users, EnrollmentRepository enrollments, LessonRepository lessons, ConflictService conflicts, NotificationService notifications) {
+    this.groups = groups; this.users = users; this.enrollments = enrollments; this.lessons = lessons; this.conflicts = conflicts; this.notifications = notifications;
   }
   public List<TutoringGroup> findAll() { return groups.findAll(); }
   public TutoringGroup findById(Long id) { return groups.findById(id).orElseThrow(() -> DomainException.notFound("Grupa nie istnieje")); }
@@ -29,7 +30,10 @@ public class GroupService {
     long active = enrollments.findByGroupId(id).stream().filter(e -> e.getStatus() == EnrollmentStatus.ACTIVE).count();
     if (data.capacity() < active) throw DomainException.conflict("Pojemność grupy jest mniejsza od liczby zapisanych kursantów");
     group.update(data.name(), data.level(), data.subject(), data.capacity());
-    if (data.tutorId() != null) group.assignTutor(requireTutor(data.tutorId()));
+    if (data.tutorId() != null) {
+      checkTutorConflictsForGroup(id, data.tutorId());
+      group.assignTutor(requireTutor(data.tutorId()));
+    }
     return groups.save(group);
   }
   public Enrollment assignStudent(Long groupId, Long studentId) {
@@ -39,6 +43,9 @@ public class GroupService {
     Enrollment existing = enrollments.findByStudentId(studentId).stream().filter(e -> e.getGroup().getId().equals(groupId)).findFirst().orElse(null);
     if (existing != null && existing.getStatus() == EnrollmentStatus.ACTIVE) throw DomainException.conflict("Kursant jest już przypisany do grupy");
     if (!group.hasFreePlaces()) throw DomainException.conflict("Brak wolnych miejsc");
+    boolean collision = lessons.findByGroupId(groupId).stream().filter(l -> l.getStatus() == LessonStatus.PLANNED)
+        .anyMatch(l -> conflicts.checkStudentConflict(studentId, l.getDate(), l.getStartTime(), l.getEndTime()));
+    if (collision) throw DomainException.conflict("Plan zajęć kursanta zawiera konflikt");
     Enrollment enrollment = existing == null ? new Enrollment(student, group) : existing;
     enrollment.activate();
     enrollment = enrollments.save(enrollment);
@@ -56,6 +63,7 @@ public class GroupService {
   }
   public TutoringGroup assignTutor(Long groupId, Long tutorId) {
     TutoringGroup group = findById(groupId);
+    checkTutorConflictsForGroup(groupId, tutorId);
     group.assignTutor(requireTutor(tutorId));
     return groups.save(group);
   }
@@ -70,6 +78,14 @@ public class GroupService {
       l.cancel(); lessons.save(l); notifications.notifyLessonCancelled(l);
     });
     groups.delete(group);
+  }
+  private void checkTutorConflictsForGroup(Long groupId, Long tutorId) {
+    lessons.findByGroupId(groupId).stream()
+        .filter(l -> l.getStatus() == LessonStatus.PLANNED)
+        .forEach(l -> {
+          if (conflicts.checkTutorConflict(tutorId, l.getDate(), l.getStartTime(), l.getEndTime(), null))
+            throw DomainException.conflict("Korepetytor ma zajęcia kolidujące z terminami tej grupy");
+        });
   }
   private User requireTutor(Long id) {
     User tutor = users.findById(id);

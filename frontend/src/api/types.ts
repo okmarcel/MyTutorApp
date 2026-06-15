@@ -36,6 +36,7 @@ export type Lesson = {
   startTime: string;
   endTime: string;
   status: LessonStatus;
+  note: string | null;
 };
 export type Notification = {
   id: number;

@@ -142,6 +142,7 @@ class MyTutorServicesTest {
     assertThat(lesson.getEndTime()).isEqualTo(LocalTime.of(10, 0));
   }
 
+  @Test
   void removeCompletedAndPlaneddLesson(){
     User tutor = user("Jan", "Tutor", "tutor2@example.com", UserRole.TUTOR);
     TutoringGroup first = groups.createGroup(new GroupRequest("Grupa 1", "A1", "angielski", 5, tutor.getId()));
@@ -151,16 +152,14 @@ class MyTutorServicesTest {
 
     schedule.removeLesson(lesson.getId());
 
-    Notification notification = notifications.findByUserId(tutor.getId()).getFirst();
-
-    assertThat(notification.getTitle()).isEqualTo("Zajęcia odwołane");
+    assertThat(notifications.findByUserId(tutor.getId()))
+        .anyMatch(n -> n.getTitle().equals("Zajęcia odwołane"));
 
     assertThat(schedule.findById(lesson.getId()).getStatus()).isEqualTo(LessonStatus.CANCELLED);
 
     lesson.complete();
     assertThatThrownBy(() -> schedule.removeLesson(lesson.getId()))
-        .isInstanceOf(DomainException.class).hasMessage("Nie można edytować zakończonej lekcji");
-
+        .isInstanceOf(DomainException.class).hasMessage("Nie można odwołać zakończonej lekcji");
 
   }
 
@@ -200,7 +199,7 @@ class MyTutorServicesTest {
   }
 
   @Test
-  void editGroupWithLowerCapcityThanStudentsEnrolled(){
+  void editGroupWithLowerCapacityThanStudentsEnrolled(){
     User tutor = user("Jan", "Tutor", "tutor@example.com", UserRole.TUTOR);
     User first = user("Anna", "Student", "anna@example.com", UserRole.STUDENT);
     User second = user("Ola", "Student", "ola@example.com", UserRole.STUDENT);
@@ -236,7 +235,52 @@ class MyTutorServicesTest {
 
   }
 
+  @Test
+  void rejectsAssignStudentToGroupWithConflictingLesson() {
+    User tutorA = user("Jan", "Tutor", "tutor1@example.com", UserRole.TUTOR);
+    User tutorB = user("Piotr", "Tutor", "tutor2@example.com", UserRole.TUTOR);
+    User student = user("Anna", "Student", "student@example.com", UserRole.STUDENT);
 
+    TutoringGroup groupA = groups.createGroup(new GroupRequest("Grupa A", "A1", "chemia", 5, tutorA.getId()));
+    TutoringGroup groupB = groups.createGroup(new GroupRequest("Grupa B", "A1", "chemia", 5, tutorB.getId()));
+
+    LocalDate date = LocalDate.now().plusDays(1);
+    schedule.createLesson(new LessonRequest(groupA.getId(), date, LocalTime.of(10, 0), LocalTime.of(11, 0)));
+    schedule.createLesson(new LessonRequest(groupB.getId(), date, LocalTime.of(10, 0), LocalTime.of(11, 0)));
+    enrollments.enrollStudent(student.getId(), groupA.getId());
+
+    assertThatThrownBy(() -> groups.assignStudent(groupB.getId(), student.getId()))
+        .isInstanceOf(DomainException.class).hasMessage("Plan zajęć kursanta zawiera konflikt");
+  }
+
+  @Test
+  void rejectsAssignTutorWithConflictingSchedule() {
+    User tutor = user("Jan", "Tutor", "tutor_sc3@example.com", UserRole.TUTOR);
+    User tutor2 = user("Piotr", "Tutor2", "tutor2_sc3@example.com", UserRole.TUTOR);
+
+    TutoringGroup groupA = groups.createGroup(new GroupRequest("Grupa A", "A1", "historia", 5, tutor.getId()));
+    TutoringGroup groupB = groups.createGroup(new GroupRequest("Grupa B", "A1", "historia", 5, null));
+
+    LocalDate date = LocalDate.now().plusDays(1);
+    schedule.createLesson(new LessonRequest(groupA.getId(), date, LocalTime.of(10, 0), LocalTime.of(11, 0)));
+    schedule.createLesson(new LessonRequest(groupB.getId(), date, LocalTime.of(10, 0), LocalTime.of(11, 0)));
+
+    assertThatThrownBy(() -> groups.assignTutor(groupB.getId(), tutor.getId()))
+        .isInstanceOf(DomainException.class).hasMessage("Korepetytor ma zajęcia kolidujące z terminami tej grupy");
+  }
+
+  @Test
+  void savesAndRetrievesLessonNote() {
+    User tutor = user("Jan", "Tutor", "tutor_sc4@example.com", UserRole.TUTOR);
+    TutoringGroup group = groups.createGroup(new GroupRequest("Grupa", "A1", "biologia", 5, tutor.getId()));
+    Lesson lesson = schedule.createLesson(new LessonRequest(group.getId(), LocalDate.now().plusDays(1), LocalTime.of(10, 0), LocalTime.of(11, 0)));
+
+    schedule.updateNote(lesson.getId(), "Przynieść zeszyt");
+
+    assertThat(schedule.findById(lesson.getId()).getNote()).isEqualTo("Przynieść zeszyt");
+  }
+
+  
   private User user(String firstName, String lastName, String email, UserRole role) {
     return users.addUser(new UserRequest(firstName, lastName, email, null, "secret", role));
   }
