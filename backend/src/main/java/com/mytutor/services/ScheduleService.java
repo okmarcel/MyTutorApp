@@ -19,6 +19,7 @@ public class ScheduleService {
   }
   public List<Lesson> findAll() { return lessons.findAll(); }
   public Lesson findById(Long id) { return lessons.findById(id).orElseThrow(() -> DomainException.notFound("Lekcja nie istnieje")); }
+  public List<Lesson> findLessonsForGroup(Long groupId) { return lessons.findByGroupId(groupId); }
   public List<Lesson> findLessonsForUser(Long userId) {
     List<Lesson> tutorLessons = lessons.findByGroupTutorId(userId);
     return tutorLessons.isEmpty() ? lessons.findActiveByStudentId(userId) : tutorLessons;
