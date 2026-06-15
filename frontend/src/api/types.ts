@@ -1,9 +1,8 @@
-
 export type UserRole = "ADMIN" | "TUTOR" | "STUDENT";
 export type LessonStatus = "PLANNED" | "CANCELLED" | "COMPLETED";
 export type EnrollmentStatus = "ACTIVE" | "CANCELLED";
 export type NotificationStatus = "UNREAD" | "READ";
-/* ---- Entities (match backend JSON) ---- */
+
 export type User = {
   id: number;
   firstName: string;
