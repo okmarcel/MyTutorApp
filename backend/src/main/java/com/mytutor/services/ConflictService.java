@@ -17,7 +17,10 @@ public class ConflictService {
     return lessons.findByGroupId(groupId).stream().anyMatch(l -> conflicts(l, date, start, end, ignoredLessonId));
   }
   public boolean checkStudentConflict(Long studentId, LocalDate date, LocalTime start, LocalTime end) {
-    return lessons.findActiveByStudentId(studentId).stream().anyMatch(l -> conflicts(l, date, start, end, null));
+    return checkStudentConflict(studentId, date, start, end, null);
+  }
+  public boolean checkStudentConflict(Long studentId, LocalDate date, LocalTime start, LocalTime end, Long ignoredLessonId) {
+    return lessons.findActiveByStudentId(studentId).stream().anyMatch(l -> conflicts(l, date, start, end, ignoredLessonId));
   }
   private boolean conflicts(Lesson existing, LocalDate date, LocalTime start, LocalTime end, Long ignoredId) {
     return (ignoredId == null || !existing.getId().equals(ignoredId))

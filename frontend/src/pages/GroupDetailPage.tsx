@@ -17,11 +17,17 @@ export function GroupDetailPage({
                                     onRefresh,
                                 }: Props) {
     const [removing, setRemoving] = useState<number | null>(null);
+    const [confirmRemove, setConfirmRemove] = useState<number | null>(null);
     const activeEnrollments = enrollments.filter(
         (e) => e.group.id === group.id && e.status === "ACTIVE"
     );
     async function handleRemoveStudent(studentId: number) {
+        if (confirmRemove !== studentId) {
+            setConfirmRemove(studentId);
+            return;
+        }
         setRemoving(studentId);
+        setConfirmRemove(null);
         try {
             await apiDelete(`/api/groups/${group.id}/students/${studentId}`);
             onRefresh();
@@ -97,7 +103,7 @@ export function GroupDetailPage({
                             onClick={() => handleRemoveStudent(e.student.id)}
                             disabled={removing === e.student.id}
                         >
-                            {removing === e.student.id ? "..." : "Usuń"}
+                            {removing === e.student.id ? "..." : confirmRemove === e.student.id ? "Na pewno?" : "Usuń"}
                         </button>
                     </div>
                 ))}

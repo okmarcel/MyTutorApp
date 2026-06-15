@@ -13,6 +13,7 @@ public class Lesson {
   @Column(nullable = false) private LocalTime startTime;
   @Column(nullable = false) private LocalTime endTime;
   @Enumerated(EnumType.STRING) @Column(nullable = false) private LessonStatus status;
+  @Column(columnDefinition = "TEXT") private String note;
 
   protected Lesson() {}
   public Lesson(TutoringGroup group, LocalDate date, LocalTime startTime, LocalTime endTime) {
@@ -24,6 +25,8 @@ public class Lesson {
   public LocalTime getStartTime() { return startTime; }
   public LocalTime getEndTime() { return endTime; }
   public LessonStatus getStatus() { return status; }
+  public String getNote() { return note; }
+  public void updateNote(String note) { this.note = note; }
   public boolean conflictsWith(Lesson lesson) {
     return status == LessonStatus.PLANNED && lesson.status == LessonStatus.PLANNED && date.equals(lesson.date)
         && startTime.isBefore(lesson.endTime) && lesson.startTime.isBefore(endTime);

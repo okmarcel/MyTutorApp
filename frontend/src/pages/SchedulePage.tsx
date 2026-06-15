@@ -78,7 +78,7 @@ export function SchedulePage({ lessons, role, onOpenModal }: Props) {
                                             const durationMin = (endH - h) * 60 + endMin - startMin;
                                             return (
                                                 <div
-                                                    className="cal-event"
+                                                    className={`cal-event${l.note ? " cal-event--has-note" : ""}`}
                                                     key={l.id}
                                                     style={{
                                                         top: `${startMin + 2}px`,
@@ -91,6 +91,7 @@ export function SchedulePage({ lessons, role, onOpenModal }: Props) {
                                                     <b>{l.group.name}</b>
                                                     <br />
                                                     {l.startTime.slice(0, 5)}-{l.endTime.slice(0, 5)}
+                                                    {l.note && <div className="cal-event__note">{l.note}</div>}
                                                 </div>
                                             );
                                         })}

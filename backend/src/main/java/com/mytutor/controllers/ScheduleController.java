@@ -5,6 +5,7 @@ import com.mytutor.model.Lesson;
 import com.mytutor.services.ScheduleService;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,5 +20,6 @@ public class ScheduleController {
   @GetMapping("/group/{groupId}") public List<Lesson> findForGroup(@PathVariable Long groupId) { return schedule.findLessonsForGroup(groupId); }
   @PostMapping @ResponseStatus(HttpStatus.CREATED) public Lesson create(@Valid @RequestBody LessonRequest request) { return schedule.createLesson(request); }
   @PutMapping("/{id}") public Lesson edit(@PathVariable Long id, @Valid @RequestBody LessonRequest request) { return schedule.editLesson(id, request); }
+  @PutMapping("/{id}/note") public Lesson updateNote(@PathVariable Long id, @RequestBody Map<String, String> body) { return schedule.updateNote(id, body.get("note")); }
   @DeleteMapping("/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void cancel(@PathVariable Long id) { schedule.removeLesson(id); }
 }

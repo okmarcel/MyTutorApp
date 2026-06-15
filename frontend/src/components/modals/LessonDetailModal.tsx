@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { apiDelete, apiPost } from "../../api/client";
+import { apiDelete, apiPost, apiPut } from "../../api/client";
 import { formatDatePL } from "../../api/format";
 import type { Lesson, UserRole } from "../../api/types";
 type Props = {
@@ -21,9 +21,23 @@ export function LessonDetailModal({
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
     const [confirmAction, setConfirmAction] = useState(false);
-    const canDelete = role === "ADMIN" || role === "TUTOR";
+    const [note, setNote] = useState(lesson.note ?? "");
+    const canEdit = role === "ADMIN" || role === "TUTOR";
+    const canDelete = canEdit;
     const canEnroll = role === "STUDENT" && !isEnrolled && lesson.group.freePlaces;
     const canUnenroll = role === "STUDENT" && isEnrolled;
+    async function handleSaveNote() {
+        setSaving(true);
+        setError("");
+        try {
+            await apiPut(`/api/lessons/${lesson.id}/note`, { note: note || null });
+            onDone();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Nie udało się zapisać notatki");
+        } finally {
+            setSaving(false);
+        }
+    }
     async function handleDelete() {
         if (!confirmAction) {
             setConfirmAction(true);
@@ -100,6 +114,31 @@ export function LessonDetailModal({
                         <div>{lesson.group.tutor.fullName}</div>
                     </div>
                 )}
+                {canEdit ? (
+                    <div className="field">
+                        <label>Notatka</label>
+                        <textarea
+                            className="input note-textarea"
+                            rows={3}
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Dodaj notatkę dla kursantów..."
+                        />
+                        <button
+                            type="button"
+                            className="btn btn-secondary btn-sm note-save-btn"
+                            onClick={handleSaveNote}
+                            disabled={saving}
+                        >
+                            {saving ? "Zapisuję..." : "Zapisz notatkę"}
+                        </button>
+                    </div>
+                ) : lesson.note ? (
+                    <div className="field">
+                        <label>Notatka</label>
+                        <div className="note-text">{lesson.note}</div>
+                    </div>
+                ) : null}
                 <div className="modal-footer">
                     {canDelete && (
                         <button
