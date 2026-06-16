@@ -678,10 +678,20 @@ img { max-width: 100%; }
     align-items: center;
     gap: 12px;
     margin-top: 24px;
+    flex-wrap: wrap;
 }
 .modal-footer-right {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+}
+.modal-footer-close { margin-left: auto; }
+@media (max-width: 520px) {
+    .modal-footer .btn {
+        flex: 1 1 100%;
+        justify-content: center;
+    }
+    .modal-footer-close { margin-left: 0; }
 }
 .modal-error {
     padding: 10px 14px;
