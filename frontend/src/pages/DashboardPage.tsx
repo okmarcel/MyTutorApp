@@ -85,18 +85,12 @@ export function DashboardPage({
                 </div>
             )}
             {role === "TUTOR" && (
-                <div className="actions-grid" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+                <div className="actions-grid" style={{ gridTemplateColumns: "repeat(2, 1fr)" }}>
                     <button
                         className="action-btn"
                         onClick={() => onOpenModal({ type: "add-lesson" })}
                     >
                         Dodaj zajęcia
-                    </button>
-                    <button
-                        className="action-btn"
-                        onClick={() => onOpenModal({ type: "add-student" })}
-                    >
-                        Dodaj kursanta
                     </button>
                     <button
                         className="action-btn"

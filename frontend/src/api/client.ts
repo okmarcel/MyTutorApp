@@ -19,6 +19,21 @@ export class ApiError extends Error {
     return {};
   }
 }
+type ApiAuth = {
+  userId: number;
+  role: string;
+};
+
+let apiAuth: ApiAuth | null = null;
+
+export function setApiAuth(auth: ApiAuth) {
+  apiAuth = auth;
+}
+
+export function clearApiAuth() {
+  apiAuth = null;
+}
+
 async function safeJson(res: Response) {
   const text = await res.text();
   if (!text) return undefined;
@@ -34,11 +49,18 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const base = (import.meta.env.VITE_API_BASE as string | undefined) ?? "";
   const url = `${base}${path}`;
+  const authHeaders = apiAuth
+      ? {
+        "X-User-Id": String(apiAuth.userId),
+        "X-User-Role": apiAuth.role,
+      }
+      : {};
   const res = await fetch(url, {
     ...init,
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      ...authHeaders,
       ...init.headers,
     },
   });

@@ -30,11 +30,22 @@ export function useData(role: UserRole | null, userId: number | null) {
         setLoading(true);
         setError("");
         try {
+            let usersData: User[] = [];
+            let groupsData: TutoringGroup[] = [];
 
-            const [usersData, groupsData] = await Promise.all([
-                apiGet<User[]>("/api/users"),
-                apiGet<TutoringGroup[]>("/api/groups"),
-            ]);
+            if (role === "ADMIN") {
+                [usersData, groupsData] = await Promise.all([
+                    apiGet<User[]>("/api/users"),
+                    apiGet<TutoringGroup[]>("/api/groups"),
+                ]);
+            } else if (role === "TUTOR" && userId) {
+                [usersData, groupsData] = await Promise.all([
+                    apiGet<User[]>("/api/users/students"),
+                    apiGet<TutoringGroup[]>(`/api/groups/tutor/${userId}`),
+                ]);
+            } else {
+                groupsData = await apiGet<TutoringGroup[]>("/api/groups");
+            }
 
             const lessonsData =
                 role === "ADMIN"
@@ -54,13 +65,13 @@ export function useData(role: UserRole | null, userId: number | null) {
                 enrollmentsData = await apiGet<Enrollment[]>(
                     `/api/enrollments/student/${userId}`
                 );
+            } else if (role === "ADMIN") {
+                enrollmentsData = await apiGet<Enrollment[]>("/api/enrollments");
             } else {
-
-                const students = usersData.filter((u) => u.role === "STUDENT");
-                if (students.length > 0) {
+                if (groupsData.length > 0) {
                     const arrays = await Promise.all(
-                        students.map((s) =>
-                            apiGet<Enrollment[]>(`/api/enrollments/student/${s.id}`).catch(
+                        groupsData.map((group) =>
+                            apiGet<Enrollment[]>(`/api/enrollments/group/${group.id}`).catch(
                                 () => [] as Enrollment[]
                             )
                         )

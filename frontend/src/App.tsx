@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useData } from "./hooks/useData";
 import type { UserRole, View, ModalState } from "./api/types";
+import { clearApiAuth, setApiAuth } from "./api/client";
 
 import { Sidebar, MobileNav } from "./components/Sidebar";
 
@@ -50,10 +51,12 @@ export default function App() {
     }, [data.groups, auth]);
 
     function handleLogin(role: UserRole, userId: number, username: string) {
+        setApiAuth({ role, userId });
         setAuth({ role, userId, username });
         setView("dashboard");
     }
     function handleLogout() {
+        clearApiAuth();
         setAuth(null);
         setView("dashboard");
         setModal(null);
@@ -134,7 +137,7 @@ export default function App() {
         }
         case "students":
             content = (
-                <StudentsPage users={data.users} onOpenModal={setModal} />
+                <StudentsPage users={data.users} role={role} onOpenModal={setModal} />
             );
             break;
         case "tutors":
@@ -261,6 +264,7 @@ export default function App() {
                 modalEl = (
                     <LessonDetailModal
                         lesson={modal.lesson}
+                        groups={role === "TUTOR" ? visibleGroups : data.groups}
                         role={role}
                         userId={userId}
                         isEnrolled={data.enrollments.some(

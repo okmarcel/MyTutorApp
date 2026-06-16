@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { apiDelete, apiPost, apiPut } from "../../api/client";
 import { formatDatePL } from "../../api/format";
-import type { Lesson, UserRole } from "../../api/types";
+import type { Lesson, LessonRequest, TutoringGroup, UserRole } from "../../api/types";
 type Props = {
     lesson: Lesson;
+    groups: TutoringGroup[];
     role: UserRole;
     userId: number;
     isEnrolled: boolean;
@@ -12,6 +13,7 @@ type Props = {
 };
 export function LessonDetailModal({
                                       lesson,
+                                      groups,
                                       role,
                                       userId,
                                       isEnrolled,
@@ -22,10 +24,39 @@ export function LessonDetailModal({
     const [saving, setSaving] = useState(false);
     const [confirmAction, setConfirmAction] = useState(false);
     const [note, setNote] = useState(lesson.note ?? "");
+    const [editingLesson, setEditingLesson] = useState(false);
+    const [editGroupId, setEditGroupId] = useState(String(lesson.group.id));
+    const [editDate, setEditDate] = useState(lesson.date);
+    const [editStartTime, setEditStartTime] = useState(lesson.startTime.slice(0, 5));
+    const [editEndTime, setEditEndTime] = useState(lesson.endTime.slice(0, 5));
     const canEdit = role === "ADMIN" || role === "TUTOR";
     const canDelete = canEdit;
     const canEnroll = role === "STUDENT" && !isEnrolled && lesson.group.freePlaces;
     const canUnenroll = role === "STUDENT" && isEnrolled;
+    const availableGroups = groups.length > 0 ? groups : [lesson.group];
+    const selectedGroup = availableGroups.find((g) => g.id === Number(editGroupId)) ?? lesson.group;
+    async function handleSaveLesson() {
+        setError("");
+        const body: LessonRequest = {
+            groupId: Number(editGroupId),
+            date: editDate,
+            startTime: editStartTime,
+            endTime: editEndTime,
+        };
+        if (!body.groupId || !body.date || !body.startTime || !body.endTime) {
+            setError("Wypełnij wszystkie pola terminu");
+            return;
+        }
+        setSaving(true);
+        try {
+            await apiPut(`/api/lessons/${lesson.id}`, body);
+            onDone();
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Nie udało się zapisać zmian");
+        } finally {
+            setSaving(false);
+        }
+    }
     async function handleSaveNote() {
         setSaving(true);
         setError("");
@@ -92,21 +123,60 @@ export function LessonDetailModal({
                 {error && <div className="modal-error">{error}</div>}
                 <div className="field">
                     <label>Zajęcia</label>
-                    <div style={{ fontSize: 16, fontWeight: 600 }}>
-                        {lesson.group.name}
-                    </div>
+                    {editingLesson ? (
+                        <select
+                            className="input select-input"
+                            value={editGroupId}
+                            onChange={(e) => setEditGroupId(e.target.value)}
+                        >
+                            {availableGroups.map((group) => (
+                                <option value={group.id} key={group.id}>
+                                    {group.name}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <div style={{ fontSize: 16, fontWeight: 600 }}>
+                            {lesson.group.name}
+                        </div>
+                    )}
                 </div>
                 <div className="field">
                     <label>Poziom</label>
-                    <div>{lesson.group.level}</div>
+                    <div>{editingLesson ? selectedGroup.level : lesson.group.level}</div>
                 </div>
                 <div className="field">
                     <label>Data i godzina</label>
-                    <div>
-                        {formatDatePL(lesson.date)}
-                        <br />
-                        {lesson.startTime.slice(0, 5)} - {lesson.endTime.slice(0, 5)}
-                    </div>
+                    {editingLesson ? (
+                        <>
+                            <input
+                                className="input"
+                                type="date"
+                                value={editDate}
+                                onChange={(e) => setEditDate(e.target.value)}
+                            />
+                            <div className="two-col" style={{ marginTop: 12 }}>
+                                <input
+                                    className="input"
+                                    type="time"
+                                    value={editStartTime}
+                                    onChange={(e) => setEditStartTime(e.target.value)}
+                                />
+                                <input
+                                    className="input"
+                                    type="time"
+                                    value={editEndTime}
+                                    onChange={(e) => setEditEndTime(e.target.value)}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <div>
+                            {formatDatePL(lesson.date)}
+                            <br />
+                            {lesson.startTime.slice(0, 5)} - {lesson.endTime.slice(0, 5)}
+                        </div>
+                    )}
                 </div>
                 {lesson.group.tutor && (
                     <div className="field">
@@ -147,6 +217,33 @@ export function LessonDetailModal({
                             disabled={saving}
                         >
                             {confirmAction ? "Na pewno?" : "Usuń zajęcia"}
+                        </button>
+                    )}
+                    {canEdit && editingLesson && (
+                        <button
+                            className="btn btn-primary"
+                            onClick={handleSaveLesson}
+                            disabled={saving}
+                        >
+                            {saving ? "Zapisuję..." : "Zapisz zmiany"}
+                        </button>
+                    )}
+                    {canEdit && !editingLesson && (
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => setEditingLesson(true)}
+                            disabled={saving}
+                        >
+                            Edytuj termin
+                        </button>
+                    )}
+                    {canEdit && editingLesson && (
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => setEditingLesson(false)}
+                            disabled={saving}
+                        >
+                            Anuluj edycję
                         </button>
                     )}
                     {canEnroll && (

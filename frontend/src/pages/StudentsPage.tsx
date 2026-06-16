@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import type { User, ModalState } from "../api/types";
+import type { User, ModalState, UserRole } from "../api/types";
 type Props = {
     users: User[];
+    role: UserRole;
     onOpenModal: (m: ModalState) => void;
 };
-export function StudentsPage({ users, onOpenModal }: Props) {
+export function StudentsPage({ users, role, onOpenModal }: Props) {
     const [search, setSearch] = useState("");
     const students = useMemo(
         () => users.filter((u) => u.role === "STUDENT"),
@@ -22,12 +23,14 @@ export function StudentsPage({ users, onOpenModal }: Props) {
         <>
             <div className="page-header">
                 <h1>Kursanci</h1>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => onOpenModal({ type: "add-student" })}
-                >
-                    + Dodaj kursanta
-                </button>
+                {role === "ADMIN" && (
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => onOpenModal({ type: "add-student" })}
+                    >
+                        + Dodaj kursanta
+                    </button>
+                )}
             </div>
             <div className="toolbar">
                 <input
@@ -44,7 +47,7 @@ export function StudentsPage({ users, onOpenModal }: Props) {
                         <th>Imię i nazwisko</th>
                         <th>Email</th>
                         <th>Telefon</th>
-                        <th>Akcje</th>
+                        {role === "ADMIN" && <th>Akcje</th>}
                     </tr>
                     </thead>
                     <tbody>
@@ -53,21 +56,23 @@ export function StudentsPage({ users, onOpenModal }: Props) {
                             <td>{s.fullName}</td>
                             <td>{s.email}</td>
                             <td>{s.phoneNumber ?? "—"}</td>
-                            <td>
-                                <button
-                                    className="btn btn-secondary btn-sm"
-                                    onClick={() =>
-                                        onOpenModal({ type: "edit-user", user: s })
-                                    }
-                                >
-                                    Edytuj
-                                </button>
-                            </td>
+                            {role === "ADMIN" && (
+                                <td>
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() =>
+                                            onOpenModal({ type: "edit-user", user: s })
+                                        }
+                                    >
+                                        Edytuj
+                                    </button>
+                                </td>
+                            )}
                         </tr>
                     ))}
                     {filtered.length === 0 && (
                         <tr>
-                            <td colSpan={4} className="empty-state">
+                            <td colSpan={role === "ADMIN" ? 4 : 3} className="empty-state">
                                 Brak kursantów
                             </td>
                         </tr>
