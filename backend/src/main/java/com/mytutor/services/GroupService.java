@@ -20,6 +20,7 @@ public class GroupService {
     this.groups = groups; this.users = users; this.enrollments = enrollments; this.lessons = lessons; this.conflicts = conflicts; this.notifications = notifications;
   }
   public List<TutoringGroup> findAll() { return groups.findAll(); }
+  public List<TutoringGroup> findByTutorId(Long tutorId) { return groups.findByTutorId(tutorId); }
   public TutoringGroup findById(Long id) { return groups.findById(id).orElseThrow(() -> DomainException.notFound("Grupa nie istnieje")); }
   public TutoringGroup createGroup(GroupRequest data) {
     User tutor = data.tutorId() == null ? null : requireTutor(data.tutorId());

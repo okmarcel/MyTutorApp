@@ -19,7 +19,9 @@ public class EnrollmentService {
   public EnrollmentService(EnrollmentRepository enrollments, LessonRepository lessons, GroupService groups, UserService users, ConflictService conflicts, NotificationService notifications) {
     this.enrollments = enrollments; this.lessons = lessons; this.groups = groups; this.users = users; this.conflicts = conflicts; this.notifications = notifications;
   }
+  public List<Enrollment> findAll() { return enrollments.findAll(); }
   public List<Enrollment> findByStudentId(Long studentId) { return enrollments.findByStudentId(studentId); }
+  public List<Enrollment> findByGroupId(Long groupId) { return enrollments.findByGroupId(groupId); }
   public Enrollment enrollStudent(Long studentId, Long groupId) {
     TutoringGroup group = groups.findById(groupId);
     User student = users.findById(studentId);

@@ -1,10 +1,10 @@
 package com.mytutor.services;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.notNull;
 
 import com.mytutor.dto.*;
 import com.mytutor.model.*;
+import com.mytutor.security.CurrentUser;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ class MyTutorServicesTest {
   @Autowired ScheduleService schedule;
   @Autowired EnrollmentService enrollments;
   @Autowired NotificationService notifications;
+  @Autowired AccessService access;
 
   @Test
   void createsDomainAndRejectsDuplicateEnrollmentAndFullGroup() {
@@ -140,6 +141,25 @@ class MyTutorServicesTest {
     assertThat(lesson.getGroup()).isEqualTo(second);
     assertThat(lesson.getStartTime()).isEqualTo(LocalTime.of(9, 0));
     assertThat(lesson.getEndTime()).isEqualTo(LocalTime.of(10, 0));
+    assertThat(notifications.findByUserId(tutor.getId()))
+        .anyMatch(n -> n.getTitle().equals("Zmiana terminu zajęć"));
+  }
+
+  @Test
+  void rejectsEditingLessonIntoStudentConflict() {
+    User tutorA = user("Jan", "Tutor", "tutor_edit_a@example.com", UserRole.TUTOR);
+    User tutorB = user("Piotr", "Tutor", "tutor_edit_b@example.com", UserRole.TUTOR);
+    User student = user("Anna", "Student", "student_edit@example.com", UserRole.STUDENT);
+    TutoringGroup first = groups.createGroup(new GroupRequest("Grupa 1", "A1", "angielski", 5, tutorA.getId()));
+    TutoringGroup second = groups.createGroup(new GroupRequest("Grupa 2", "A2", "matematyka", 5, tutorB.getId()));
+    enrollments.enrollStudent(student.getId(), first.getId());
+    enrollments.enrollStudent(student.getId(), second.getId());
+    LocalDate date = LocalDate.now().plusDays(1);
+    schedule.createLesson(new LessonRequest(first.getId(), date, LocalTime.of(10, 0), LocalTime.of(11, 0)));
+    Lesson lesson = schedule.createLesson(new LessonRequest(second.getId(), date, LocalTime.of(12, 0), LocalTime.of(13, 0)));
+
+    assertThatThrownBy(() -> schedule.editLesson(lesson.getId(), new LessonRequest(second.getId(), date, LocalTime.of(10, 30), LocalTime.of(11, 30))))
+        .isInstanceOf(DomainException.class).hasMessageContaining("Termin koliduje z planem zajęć kursanta");
   }
 
   @Test
@@ -267,6 +287,21 @@ class MyTutorServicesTest {
 
     assertThatThrownBy(() -> groups.assignTutor(groupB.getId(), tutor.getId()))
         .isInstanceOf(DomainException.class).hasMessage("Korepetytor ma zajęcia kolidujące z terminami tej grupy");
+  }
+
+  @Test
+  void accessServiceRejectsUnauthorizedRoleOperations() {
+    User tutor = user("Jan", "Tutor", "access_service_tutor@example.com", UserRole.TUTOR);
+    User otherTutor = user("Piotr", "Tutor", "access_service_other_tutor@example.com", UserRole.TUTOR);
+    User student = user("Anna", "Student", "access_service_student@example.com", UserRole.STUDENT);
+    TutoringGroup group = groups.createGroup(new GroupRequest("Grupa", "A1", "historia", 5, tutor.getId()));
+
+    assertThatThrownBy(() -> access.requireAdmin(new CurrentUser(student.getId(), student.getRole())))
+        .isInstanceOf(DomainException.class).hasMessage("Brak uprawnień administratora");
+    assertThatThrownBy(() -> access.requireAdminOrGroupTutor(new CurrentUser(otherTutor.getId(), otherTutor.getRole()), group.getId()))
+        .isInstanceOf(DomainException.class).hasMessage("Brak dostępu do grupy");
+
+    access.requireAdminOrGroupTutor(new CurrentUser(tutor.getId(), tutor.getRole()), group.getId());
   }
 
   @Test

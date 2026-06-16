@@ -2,6 +2,7 @@ package com.mytutor.services;
 
 import com.mytutor.dto.UserRequest;
 import com.mytutor.model.User;
+import com.mytutor.model.UserRole;
 import com.mytutor.repositories.GroupRepository;
 import com.mytutor.repositories.UserRepository;
 import java.util.List;
@@ -16,6 +17,7 @@ public class UserService {
   public UserService(UserRepository users, GroupRepository groups) { this.users = users; this.groups = groups; }
 
   public List<User> findAll() { return users.findAll(); }
+  public List<User> findByRole(UserRole role) { return users.findByRole(role); }
   public User findById(Long id) { return users.findById(id).orElseThrow(() -> DomainException.notFound("Użytkownik nie istnieje")); }
   public User addUser(UserRequest data) {
     validateUniqueEmail(data.email(), null);

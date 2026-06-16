@@ -2,6 +2,8 @@ package com.mytutor.services;
 
 import com.mytutor.model.*;
 import com.mytutor.repositories.NotificationRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,16 @@ public class NotificationService {
   }
   public void notifyLessonCancelled(Lesson lesson) {
     notifyGroup(lesson.getGroup(), "Zajęcia odwołane", describe(lesson, "odwołane"));
+  }
+  public void notifyLessonUpdated(Lesson lesson, TutoringGroup oldGroup, LocalDate oldDate, LocalTime oldStartTime, LocalTime oldEndTime) {
+    String oldTerm = oldGroup.getName() + " " + oldDate + " " + oldStartTime + "-" + oldEndTime;
+    String newTerm = lesson.getGroup().getName() + " " + lesson.getDate() + " " + lesson.getStartTime() + "-" + lesson.getEndTime();
+    if (oldGroup.getId().equals(lesson.getGroup().getId())) {
+      notifyGroup(lesson.getGroup(), "Zmiana terminu zajęć", "Termin zajęć grupy " + oldTerm + " został zmieniony na " + newTerm);
+      return;
+    }
+    notifyGroup(oldGroup, "Zmiana terminu zajęć", "Zajęcia grupy " + oldTerm + " zostały przeniesione do grupy " + newTerm);
+    notifyGroup(lesson.getGroup(), "Zmiana terminu zajęć", "Do harmonogramu dodano przeniesione zajęcia: " + newTerm);
   }
   public void notifyEnrollmentChanged(Enrollment enrollment) {
     save(enrollment.getStudent(), "Zmiana zapisu", "Status zapisu do grupy " + enrollment.getGroup().getName() + ": " + enrollment.getStatus());

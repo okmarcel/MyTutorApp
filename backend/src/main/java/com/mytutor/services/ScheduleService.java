@@ -4,6 +4,8 @@ import com.mytutor.dto.LessonRequest;
 import com.mytutor.model.*;
 import com.mytutor.repositories.EnrollmentRepository;
 import com.mytutor.repositories.LessonRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,10 +44,16 @@ public class ScheduleService {
     validateTimes(data);
     Lesson lesson = findById(id);
     if (lesson.getStatus() == LessonStatus.COMPLETED) throw DomainException.conflict("Nie można edytować zakończonej lekcji");
+    TutoringGroup oldGroup = lesson.getGroup();
+    LocalDate oldDate = lesson.getDate();
+    LocalTime oldStartTime = lesson.getStartTime();
+    LocalTime oldEndTime = lesson.getEndTime();
     TutoringGroup group = groups.findById(data.groupId());
     checkConflicts(group, data, id);
     lesson.update(group, data.date(), data.startTime(), data.endTime());
-    return lessons.save(lesson);
+    lesson = lessons.save(lesson);
+    notifications.notifyLessonUpdated(lesson, oldGroup, oldDate, oldStartTime, oldEndTime);
+    return lesson;
   }
   public Lesson updateNote(Long id, String note) {
     Lesson lesson = findById(id);
