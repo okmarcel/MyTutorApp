@@ -35,6 +35,15 @@ export function LessonDetailModal({
     const canUnenroll = role === "STUDENT" && isEnrolled;
     const availableGroups = groups.length > 0 ? groups : [lesson.group];
     const selectedGroup = availableGroups.find((g) => g.id === Number(editGroupId)) ?? lesson.group;
+    function cancelLessonEdit() {
+        setEditingLesson(false);
+        setConfirmAction(false);
+        setEditGroupId(String(lesson.group.id));
+        setEditDate(lesson.date);
+        setEditStartTime(lesson.startTime.slice(0, 5));
+        setEditEndTime(lesson.endTime.slice(0, 5));
+        setError("");
+    }
     async function handleSaveLesson() {
         setError("");
         const body: LessonRequest = {
@@ -231,7 +240,10 @@ export function LessonDetailModal({
                     {canEdit && !editingLesson && (
                         <button
                             className="btn btn-secondary"
-                            onClick={() => setEditingLesson(true)}
+                            onClick={() => {
+                                setConfirmAction(false);
+                                setEditingLesson(true);
+                            }}
                             disabled={saving}
                         >
                             Edytuj termin
@@ -240,7 +252,7 @@ export function LessonDetailModal({
                     {canEdit && editingLesson && (
                         <button
                             className="btn btn-secondary"
-                            onClick={() => setEditingLesson(false)}
+                            onClick={cancelLessonEdit}
                             disabled={saving}
                         >
                             Anuluj edycję
@@ -264,13 +276,14 @@ export function LessonDetailModal({
                             {confirmAction ? "Na pewno?" : "Wypisz się"}
                         </button>
                     )}
-                    <button
-                        className="btn btn-secondary"
-                        onClick={onClose}
-                        style={{ marginLeft: "auto" }}
-                    >
-                        Anuluj
-                    </button>
+                    {!editingLesson && (
+                        <button
+                            className="btn btn-secondary modal-footer-close"
+                            onClick={onClose}
+                        >
+                            Anuluj
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
