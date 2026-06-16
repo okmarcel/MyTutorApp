@@ -9,4 +9,6 @@ public class DomainException extends RuntimeException {
   public static DomainException notFound(String message) { return new DomainException(HttpStatus.NOT_FOUND, message); }
   public static DomainException conflict(String message) { return new DomainException(HttpStatus.CONFLICT, message); }
   public static DomainException badRequest(String message) { return new DomainException(HttpStatus.BAD_REQUEST, message); }
+  public static DomainException unauthorized(String message) { return new DomainException(HttpStatus.UNAUTHORIZED, message); }
+  public static DomainException forbidden(String message) { return new DomainException(HttpStatus.FORBIDDEN, message); }
 }
