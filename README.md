@@ -38,7 +38,6 @@
 - Zarządzanie grupami zajęciowymi
 - Przypisywanie korepetytorów do grup
 - Tworzenie i modyfikacja harmonogramu z wykrywaniem konfliktów
-- Powiadomienia (e-mail / SMS / push) o zmianach
 - Samodzielne zapisy i rezygnacje kursantów
 - Podgląd harmonogramu dla korepetytora i kursanta
 
@@ -47,6 +46,7 @@
 - Zaawansowanej analityki ani raportów biznesowych
 - Modułu czatu / komunikatora między użytkownikami
 - Aplikacji mobilnej natywnej
+- Powiadomienia (e-mail / SMS / push) o zmianach
 
 ---
 
@@ -56,5 +56,4 @@ System zbudowany jest w architekturze **trójwarstwowej** (prezentacja - logika 
 ### Główne elementy składowe:
 - **Frontend:** Interfejs użytkownika (logowanie, dashboard, harmonogram, formularze)
 - **Backend:** Logika biznesowa (zarządzanie użytkownikami, grupami, harmonogramem, konfliktami, powiadomieniami)
-- **Baza danych (PostgreSQL):** Przechowywanie danych (użytkownicy, grupy, zajęcia, zapisy, powiadomienia)
-- **Serwis powiadomień:** Wysyłka e-mail i/lub SMS (API zewnętrzne)
+- **Baza danych (H2):** Przechowywanie danych (użytkownicy, grupy, zajęcia, zapisy, powiadomienia)
